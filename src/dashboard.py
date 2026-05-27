@@ -24,6 +24,20 @@ st.set_page_config(
 def load_data():
     base_dir = "data"
     
+    # 구글 드라이브 폴더에서 데이터 다운로드 (최초 1회)
+    # 폴더 내 필수 파일들이 없는 경우 전체 폴더를 다운로드합니다.
+    required_file = os.path.join(base_dir, '행정안전부_지역별(행정동) 성별 연령별 주민등록 1인세대수_20260430.csv')
+    if not os.path.exists(required_file):
+        st.info("🔄 구글 드라이브에서 원본 데이터를 다운로드하고 있습니다... (약 1~2분 소요)")
+        import gdown
+        folder_id = '1OldQd-haPn-HAdtUVLUx46Ci6FIl4u0g'
+        try:
+            # 폴더 전체 다운로드 (접근 권한이 '링크가 있는 모든 사용자'여야 함)
+            gdown.download_folder(id=folder_id, output=base_dir, quiet=False, use_cookies=False)
+        except Exception as e:
+            st.error("❌ 구글 드라이브 다운로드 권한 오류! 폴더의 공유 설정을 '링크가 있는 모든 사용자(뷰어)'로 변경해주세요.")
+            st.stop()
+    
     # 1. 1인가구
     pop_file = os.path.join(base_dir, '행정안전부_지역별(행정동) 성별 연령별 주민등록 1인세대수_20260430.csv')
     df_pop = pd.read_csv(pop_file, encoding='cp949')
